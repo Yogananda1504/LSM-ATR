@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Research</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --error-color: #dc2626;
+            --background-color: #f8fafc;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: var(--text-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h2 {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+
+        table tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        table a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        table a:hover {
+            text-decoration: underline;
+        }
+
+        .chart-container {
+            width: 100%;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .error {
+            color: var(--error-color);
+            background-color: #fee2e2;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            button {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .section {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            table th, table td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Research</h1>
+    <p>Enter a product name to see research data from YouTube and Reddit.</p>
+    <input type="text" id="productInput" placeholder="Enter product name">
+    <button onclick="fetchResearch()">Search</button>
+
+    <div class="results" id="results">
+        <!-- Research results, tables, and charts will be displayed here -->
+    </div>
+
+    <script>
+        function fetchResearch() {
+            const productInput = document.getElementById('productInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (!productInput) {
+                resultsDiv.innerHTML = '<p class="error">Please enter a product name.</p>';
+                return;
+            }
+
+            // Fetch research data from the backend
+            fetch(`/research/${encodeURIComponent(productInput)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display YouTube data in a table
+                    if (data.youtube_data && data.youtube_data.length > 0) {
+                        const youtubeSection = document.createElement('div');
+                        youtubeSection.className = 'section';
+                        youtubeSection.innerHTML = `
+                            <h2>YouTube Data</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>URL</th>
+                                        <th>Views</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.youtube_data.map(video => `
+                                        <tr>
+                                            <td>${video.title}</td>
+                                            <td><a href="${video.url}" target="_blank">Watch</a></td>
+                                            <td>${video.views}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                        resultsDiv.appendChild(youtubeSection);
+
+                        // Create a chart for YouTube data
+                        const youtubeLabels = data.youtube_data.map(video => video.title);
+                        const youtubeViews = data.youtube_views;
+
+                        const youtubeChartCanvas = document.createElement('canvas');
+                        youtubeChartCanvas.id = 'youtubeChart';
+                        youtubeSection.appendChild(youtubeChartCanvas);
+
+                        new Chart(youtubeChartCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: youtubeLabels,
+                                datasets: [{
+                                    label: 'Views',
+                                    data: youtubeViews,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: true, position: 'top' },
+                                    tooltip: { callbacks: { label: context => `${context.raw} views` } }
+                                },
+                                scales: {
+                                    x: { title: { display: true, text: 'Videos' } },
+                                    y: { title: { display: true, text: 'Views' } }
+                                }
+                            }
+                        });
+                    } else {
+                        resultsDiv.innerHTML += '<p class="error">No YouTube data found for this product.</p>';
+                    }
+
+                    // Display Reddit data in a table
+                    if (data.reddit_data && data.reddit_data.length > 0) {
+                        const redditSection = document.createElement('div');
+                        redditSection.className = 'section';
+                        redditSection.innerHTML = `
+                            <h2>Reddit Data</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>URL</th>
+                                        <th>Score</th>
+                                        <th>Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.reddit_data.map(post => `
+                                        <tr>
+                                            <td>${post.title}</td>
+                                            <td><a href="${post.url}" target="_blank">View Post</a></td>
+                                            <td>${post.score}</td>
+                                            <td>${post.comments}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                        resultsDiv.appendChild(redditSection);
+
+                        // Create a chart for Reddit data
+                        const redditLabels = data.reddit_data.map(post => post.title);
+                        const redditScores = data.reddit_scores;
+
+                        const redditChartCanvas = document.createElement('canvas');
+                        redditChartCanvas.id = 'redditChart';
+                        redditSection.appendChild(redditChartCanvas);
+
+                        new Chart(redditChartCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: redditLabels,
+                                datasets: [{
+                                    label: 'Scores',
+                                    data: redditScores,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: true, position: 'top' },
+                                    tooltip: { callbacks: { label: context => `${context.raw} score` } }
+                                },
+                                scales: {
+                                    x: { title: { display: true, text: 'Posts' } },
+                                    y: { title: { display: true, text: 'Scores' } }
+                                }
+                            }
+                        });
+                    } else {
+                        resultsDiv.innerHTML += '<p class="error">No Reddit data found for this product.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching research data:', error);
+                    resultsDiv.innerHTML = '<p class="error">An error occurred while fetching research data.</p>';
+                });
+        }
+    </script>
+</body>
+</html>
