@@ -75,7 +75,7 @@ def get_youtube_data(product):
 # Function to get Reddit data
 def get_reddit_data(product):
     headers = {'User-Agent': REDDIT_USER_AGENT}
-    params = {'q': product, 'limit': 5, 'sort': 'relevance', 'restrict_sr': False}
+    params = {'q': product, 'limit': 5, 'sort': 'relevance', 'restrict_sr': False, 'raw_json': 1}
     response = requests.get(REDDIT_API_URL.format(subreddit='all'), headers=headers, params=params)
     reddit_data = []
     reddit_scores = []
