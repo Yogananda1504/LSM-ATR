@@ -13,9 +13,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Get API keys from environment variables
 YOUTUBE_API_KEY = os.getenv("YOUR_YOUTUBE_API_KEY")
-REDDIT_CLIENT_ID = os.getenv("YOUR_REDDIT_CLIENT_ID")
-REDDIT_CLIENT_SECRET = os.getenv("YOUR_REDDIT_CLIENT_SECRET")
-REDDIT_USER_AGENT = os.getenv("YOUR_REDDIT_USER_AGENT")
+REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
+REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
+REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT")
 REDDIT_USER_AGENT = REDDIT_USER_AGENT if REDDIT_USER_AGENT else "MyFlaskApp/0.1.0 (by /u/YourUsername)"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -92,7 +92,10 @@ def get_reddit_data(product):
             reddit_data.append({'title': title, 'url': url, 'score': score, 'comments': comments})
             reddit_scores.append(score)
     else:
-        print(f"Error fetching Reddit data: {response.status_code}")
+        print(f"Error fetching Reddit data: Status Code {response.status_code}")
+        print(f"Response content: {response.text}")
+        print(f"Request URL: {response.url}")
+        print(f"Request headers: {headers}")
         reddit_data = []
         reddit_scores = []
 
