@@ -1,5 +1,3 @@
-
-
 import requests
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
@@ -18,6 +16,7 @@ YOUTUBE_API_KEY = os.getenv("YOUR_YOUTUBE_API_KEY")
 REDDIT_CLIENT_ID = os.getenv("YOUR_REDDIT_CLIENT_ID")
 REDDIT_CLIENT_SECRET = os.getenv("YOUR_REDDIT_CLIENT_SECRET")
 REDDIT_USER_AGENT = os.getenv("YOUR_REDDIT_USER_AGENT")
+REDDIT_USER_AGENT = REDDIT_USER_AGENT if REDDIT_USER_AGENT else "MyFlaskApp/0.1.0 (by /u/YourUsername)"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # YouTube API setup (YouTube Data API v3)
